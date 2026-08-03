@@ -107,7 +107,7 @@ export class AuthController {
       await this.authService.logout(rawRefreshToken);
     }
 
-    res.clearCookie(REFRESH_COOKIE_NAME);
+    res.clearCookie(REFRESH_COOKIE_NAME, { path: '/api/auth' });
     return { success: true };
   }
 
@@ -121,7 +121,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     await this.authService.revokeAllSessionsForUser(user.id);
-    res.clearCookie(REFRESH_COOKIE_NAME);
+    res.clearCookie(REFRESH_COOKIE_NAME, { path: '/api/auth' });
     return { success: true };
   }
 
@@ -144,7 +144,7 @@ export class AuthController {
       httpOnly: true,
       secure: isProduction, // requires HTTPS in production
       sameSite: 'lax',
-      path: '/auth', // scope the cookie to auth routes only
+      path: '/api/auth', // scope the cookie to auth routes under /api/auth
       maxAge: refreshExpiryDays * 24 * 60 * 60 * 1000,
     });
   }
