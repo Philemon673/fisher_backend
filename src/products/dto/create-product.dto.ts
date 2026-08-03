@@ -60,6 +60,7 @@ export class CreateProductDto {
   images?: ProductImageInputDto[];
 
   @IsOptional()
+  @IsArray()
   @ValidateNested()
   @Type(() => ProductVideoInputDto)
   video?: ProductVideoInputDto;
