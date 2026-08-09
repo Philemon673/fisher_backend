@@ -3,14 +3,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationQueryDto } from './dto/pagination-query.dto';
 import { CreateAddressDto, UpdateAddressDto } from './dto/address.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   /**
    * Fetches a single user's public profile shape. Throws rather than
@@ -95,9 +95,9 @@ export class UsersService {
     });
   }
 
-  
+
   // Addresses
-  
+
 
   async listAddresses(userId: string) {
     return this.prisma.address.findMany({
@@ -148,9 +148,9 @@ export class UsersService {
     return { success: true };
   }
 
-  
+
   // Internal helpers
-  
+
 
   private async ensureUserExists(userId: string): Promise<void> {
     const exists = await this.prisma.user.findUnique({ where: { id: userId } });

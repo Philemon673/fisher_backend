@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Prisma, StockStatus } from '@prisma/client';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 import { UploadsService } from '../uploads/uploads.service';
 import { CreateProductDto, UpdateProductDto } from './dto/create-product.dto';
 import { UpdateStockDto } from './dto/update-stock.dto';
@@ -16,7 +16,7 @@ export class ProductsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly uploadsService: UploadsService,
-  ) {}
+  ) { }
 
   async create(dto: CreateProductDto) {
     if (dto.categoryId) {
@@ -43,13 +43,13 @@ export class ProductsService {
           // nothing is committed.
           images: dto.images?.length
             ? {
-                create: dto.images.map((img, index) => ({
-                  url: img.url,
-                  publicId: img.publicId,
-                  altText: img.altText,
-                  position: img.position ?? index,
-                })),
-              }
+              create: dto.images.map((img, index) => ({
+                url: img.url,
+                publicId: img.publicId,
+                altText: img.altText,
+                position: img.position ?? index,
+              })),
+            }
             : undefined,
           video: dto.video
             ? { create: { url: dto.video.url, publicId: dto.video.publicId } }
