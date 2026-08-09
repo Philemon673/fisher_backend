@@ -6,6 +6,14 @@ import { PrismaModule } from '../prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { NotificationsModule } from './notification/notifications.module';
 import { MessagingModule } from './messaging/messaging.module';
+import { ProductsModule } from './products/products.module';
+import { OrdersModule } from './orders/orders.module';
+import { CartModule } from './cart/cart.module';
+import { WishlistModule } from './wishlist/wishlist.module';
+import { CategoriesModule } from './categories/categories.module';
+import { UsersModule } from './users/users.module';
+import { AdminModule } from './admin/admin.module';
+import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
   imports: [
@@ -14,10 +22,18 @@ import { MessagingModule } from './messaging/messaging.module';
     AuthModule,
     NotificationsModule,
     MessagingModule,
+    ProductsModule,
+    OrdersModule,
+    CartModule,
+    WishlistModule,
+    CategoriesModule,
+    UsersModule,
+    AdminModule,
+    UploadsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}
 
 
