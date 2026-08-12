@@ -19,15 +19,16 @@ import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationQueryDto } from './dto/pagination-query.dto';
 import { CreateAddressDto, UpdateAddressDto } from './dto/address.dto';
+import { UpdateUserRoleDto } from './dto/update-users-role.dto';
 
 @Controller()
 @UseGuards(JwtAuthGuard) // every route in this controller requires a logged-in user by default
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  
+  // ─────────────────────────────────────────────
   // Own profile
-  
+  // ─────────────────────────────────────────────
 
   @Get('users/me')
   getMyProfile(@CurrentUser() user: AuthenticatedUser) {
@@ -42,9 +43,9 @@ export class UsersController {
     return this.usersService.updateProfile(user.id, dto);
   }
 
-  
+  // ─────────────────────────────────────────────
   // Own addresses
-  
+  // ─────────────────────────────────────────────
 
   @Get('users/me/addresses')
   listMyAddresses(@CurrentUser() user: AuthenticatedUser) {
@@ -76,9 +77,9 @@ export class UsersController {
     return this.usersService.deleteAddress(user.id, addressId);
   }
 
-  
+  // ─────────────────────────────────────────────
   // Admin
-  
+  // ─────────────────────────────────────────────
 
   @Get('admin/users')
   @UseGuards(RolesGuard)
@@ -106,5 +107,16 @@ export class UsersController {
   @Roles(Role.ADMIN)
   reactivateUser(@Param('userId') userId: string) {
     return this.usersService.setActiveStatus(userId, true);
+  }
+
+  @Patch('admin/users/:userId/role')
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  updateUserRole(
+    @CurrentUser() admin: AuthenticatedUser,
+    @Param('userId') userId: string,
+    @Body() dto: UpdateUserRoleDto,
+  ) {
+    return this.usersService.setRole(userId, dto.role, admin.id);
   }
 }

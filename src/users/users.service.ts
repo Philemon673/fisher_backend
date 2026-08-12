@@ -1,8 +1,9 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, Role } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationQueryDto } from './dto/pagination-query.dto';
@@ -10,7 +11,7 @@ import { CreateAddressDto, UpdateAddressDto } from './dto/address.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   /**
    * Fetches a single user's public profile shape. Throws rather than
@@ -20,12 +21,12 @@ export class UsersService {
    * an admin looking up a user that was deleted moments ago).
    */
   async findById(userId: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
+    const user = await this.prisma.user.findFirst({
+      where: { id: userId, deletedAt: null },
       select: this.publicUserSelect(),
     });
 
-    if (!user || user.deletedAt) {
+    if (!user) {
       throw new NotFoundException('User not found');
     }
 
@@ -95,9 +96,37 @@ export class UsersService {
     });
   }
 
+  /**
+   * Promotes or demotes a user's role. Guarded at the controller level
+   * with @Roles(Role.ADMIN), so only an existing admin can ever call
+   * this — the only OTHER way to create an admin is a direct database
+   * edit, which is intentional (no self-service "become admin" path).
+   *
+   * requestingAdminId is passed so we can block an admin from
+   * accidentally demoting themselves via this endpoint — that would
+   * either lock them out mid-session or, worse, leave a system with
+   * zero admins if they're the only one. Self-demotion should go
+   * through a separate, more deliberate flow if you ever need it.
+   */
+  async setRole(userId: string, newRole: Role, requestingAdminId: string) {
+    await this.ensureUserExists(userId);
 
+    if (userId === requestingAdminId && newRole !== Role.ADMIN) {
+      throw new BadRequestException(
+        'You cannot change your own role away from ADMIN through this endpoint',
+      );
+    }
+
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { role: newRole },
+      select: this.publicUserSelect(),
+    });
+  }
+
+  // ─────────────────────────────────────────────
   // Addresses
-
+  // ─────────────────────────────────────────────
 
   async listAddresses(userId: string) {
     return this.prisma.address.findMany({
@@ -148,9 +177,9 @@ export class UsersService {
     return { success: true };
   }
 
-
+  // ─────────────────────────────────────────────
   // Internal helpers
-
+  // ─────────────────────────────────────────────
 
   private async ensureUserExists(userId: string): Promise<void> {
     const exists = await this.prisma.user.findUnique({ where: { id: userId } });
@@ -192,8 +221,8 @@ export class UsersService {
       role: true,
       isActive: true,
       createdAt: true,
-      deletedAt: true,
-      // Deliberately excludes: googleId and relations not needed on a profile response.
+      // Deliberately excludes: googleId, deletedAt, and any relation
+      // that isn't needed on a profile response.
     } satisfies Prisma.UserSelect;
   }
 }
