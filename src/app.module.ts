@@ -14,6 +14,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { UsersModule } from './users/users.module';
 import { AdminModule } from './admin/admin.module';
 import { UploadsModule } from './uploads/uploads.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { UploadsModule } from './uploads/uploads.module';
     UsersModule,
     AdminModule,
     UploadsModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -6,6 +6,7 @@ import {
 import { OrderStatus, Prisma, StockStatus } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotificationsService } from '../notification/notifications.service';
+import { MailService } from '../mail/mail.service';
 import { CreateOrderDto, UpdateOrderStatusDto } from './dto/order.dto';
 import { QueryOrdersDto } from './dto/query-orders.dto';
 
@@ -16,6 +17,7 @@ export class OrdersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly notificationsService: NotificationsService,
+    private readonly mailService: MailService,
   ) { }
 
   /**
@@ -105,6 +107,26 @@ export class OrdersService {
         title: 'New order',
         body: `Order ${order.orderNumber} — ${order.total} ${order.currency}`,
         data: { orderId: order.id, type: 'new_order' },
+      });
+
+      // Send detailed Order Email to Admin
+      await this.mailService.sendOrderNotificationToAdmin({
+        orderNumber: order.orderNumber,
+        createdAt: order.createdAt,
+        user: {
+          name: (order.user as any)?.name || undefined,
+          email: (order.user as any)?.email || '',
+        },
+        shippingInfo: dto.shippingInfo,
+        paymentMethod: dto.paymentMethod,
+        items: order.items.map((item) => ({
+          productName: item.productName,
+          quantity: item.quantity,
+          unitPrice: Number(item.unitPrice),
+        })),
+        subtotal: Number(order.subtotal),
+        shippingFee: Number(order.shippingFee),
+        total: Number(order.total),
       });
 
       return order;
