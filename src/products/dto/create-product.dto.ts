@@ -1,4 +1,4 @@
-import { PartialType, OmitType } from '@nestjs/mapped-types';
+﻿import { PartialType, OmitType } from '@nestjs/mapped-types';
 import { Type } from 'class-transformer';
 import {
   IsArray,
@@ -60,7 +60,6 @@ export class CreateProductDto {
   images?: ProductImageInputDto[];
 
   @IsOptional()
-  @IsArray()
   @ValidateNested()
   @Type(() => ProductVideoInputDto)
   video?: ProductVideoInputDto;

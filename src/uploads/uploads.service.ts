@@ -1,4 +1,4 @@
-import {
+﻿import {
   BadRequestException,
   Inject,
   Injectable,
@@ -9,8 +9,17 @@ import { v2 as CloudinaryType, UploadApiErrorResponse, UploadApiResponse } from 
 import { CLOUDINARY_PROVIDER } from './cloudinary.provider';
 import type { UploadResult } from './upload-result.interface';
 
-const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
-const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/quicktime'];
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/gif'];
+const ALLOWED_VIDEO_TYPES = [
+  'video/mp4',
+  'video/webm',
+  'video/quicktime',
+  'video/x-matroska',
+  'video/ogg',
+  'video/3gpp',
+  'video/x-msvideo',
+  'video/avi',
+];
 
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024; // 8MB
 const MAX_VIDEO_BYTES = 100 * 1024 * 1024; // 100MB
